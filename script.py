@@ -24,15 +24,20 @@ def create_masks(hsv_image):
     red_mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
     red_mask = cv2.bitwise_or(red_mask1, red_mask2)
 
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     return blue_mask, red_mask
 
 def find_blue_contours(blue_mask, blue_kernel):
     blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_CLOSE, blue_kernel)
+    cv2.imshow("Blue Mask", blue_mask)
     blue_contours, _ = cv2.findContours(blue_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return blue_contours
 
 def find_red_contours(red_mask, open_red_kernel, close_kernel, image):
     edges = cv2.Canny(image, 100, 200)
+    cv2.imshow("Canny", edges)
     edges = cv2.dilate(edges, np.ones((5, 5), np.uint8), iterations=2)
     red_mask = cv2.bitwise_and(red_mask, edges)
 
@@ -45,6 +50,7 @@ def find_red_contours(red_mask, open_red_kernel, close_kernel, image):
     red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, close_kernel)
     red_contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     all_red_contours.extend(red_contours)
+    cv2.imshow("Red Mask", red_mask)
 
     return all_red_contours
 
@@ -72,7 +78,7 @@ def detect_traffic_signs(image, blue_contours, red_contours):
                 circularity = 4 * np.pi * area / (cv2.arcLength(contour, True) ** 2)
                 if circularity >= 0.6:
                     cv2.drawContours(image, [contour], -1, (0, 255, 0), 1)
-                    cv2.putText(image, "Obligation", (int(x), int(y) - 10), cv2.FONT_HERSHEY_COMPLEX, 0.8, (250, 0, 0), 2)
+                    cv2.putText(image, "Obligation", (int(x), int(y) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (250, 0, 0), 2)
 
     for contour in red_contours:
         area = cv2.contourArea(contour)
@@ -98,11 +104,13 @@ def detect_traffic_signs(image, blue_contours, red_contours):
 
 def process_image(image_path):
     image = cv2.imread(image_path)
-    if image is not None:
-        processed_image, blue_contours, red_contours = find_contours(image)
-        final_image = detect_traffic_signs(image, blue_contours, red_contours)
-        return final_image
-    return None
+    if image is None:
+        print("Error: No image found")
+        return None
+
+    image, blue_contours, red_contours = find_contours(image)
+    final_image = detect_traffic_signs(image, blue_contours, red_contours)
+    return final_image
 
 if __name__ == "__main__":
     input_directory = "signals"
