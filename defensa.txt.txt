@@ -1,6 +1,0 @@
-1ª Realizar un filtro gaussiano para la disminución de ruido y una mejor detección de bordes.
-2ª Aproximación crear máscaras de rojo y azul para quedarnos con los bordes únicamente de las señales
-3ª Aproximación (anteriormente utilizaba aproxPolyDp para aproximar los contornos a polígonos ydespues contaba vertices para determinar figuras pero esto era demasiado restrictivo)
-4ª Aproximación utilización del porcentaje de contorno y la relación de aspecto para validar la forma.
-5º Ver si el contorno es suave para afirmar que es un circulo 
-6º Dilatar para rellenar los simbolos del interior
